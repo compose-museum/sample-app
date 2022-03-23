@@ -1,7 +1,5 @@
 package com.example.compose.waveloading
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,25 +39,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview
 @Composable
 fun WaveLoadingDemo() {
     var _progress by remember { mutableStateOf(0.5f) }
     var _velocity by remember { mutableStateOf(1.0f) }
     var _amplitude by remember { mutableStateOf(0.2f) }
-    var _bitmap by remember {
-        mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565))
-    }
 
-    val _context = LocalContext.current
     val size = LocalDensity.current.run {
         200.dp.toPx().roundToInt()
     }
-
-
-    LaunchedEffect(Unit) {
-        _bitmap = BitmapFactory.decodeResource(_context.resources, R.drawable.logo_nba)
-            .scale(size, size)
-    }
+    val _bitmap = ImageBitmap.imageResource(id = R.drawable.logo_nba)
+        .asAndroidBitmap().scale(size, size)
 
     WaveLoadingDemoTheme {
         Column {
@@ -75,10 +64,8 @@ fun WaveLoadingDemo() {
                         .size(200.dp)
                         .clipToBounds()
                         .align(Alignment.Center),
-                    progress = _progress,
-                    velocity = _velocity,
-                    amplitude = _amplitude,
-                    source = _bitmap
+                    WaveConfig(_progress, _amplitude, _velocity),
+                    bitmap = _bitmap
                 )
 
             }
